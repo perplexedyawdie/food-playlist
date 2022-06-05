@@ -7,13 +7,18 @@ export interface CoordinatesData {
     description: string;
 }
 
-export interface MarkerProps {
-    foodPlaceName: string;
-    foodPlaceType: PlaylistItemType;
+export interface MarkerCoords {
+    lat: string;
+    lng: string;
 }
 
 export enum PlaylistItemType {
     FOOD = '🍽',
     DRINK = '🥤',
     CHILL = '🏞'
+}
+
+export interface MapCoordinates {
+    lat: number;
+    lng: number;
 }
