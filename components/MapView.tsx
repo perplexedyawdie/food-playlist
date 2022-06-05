@@ -24,7 +24,7 @@ const MapView: NextPage<Props> = ({ mapCoords, markers, playlistItems }: Props) 
                         lat: mapCoords.lat,
                         lng: mapCoords.lng
                     }}
-                    defaultZoom={16}
+                    defaultZoom={12}
                     onClick={handleMapClick}
                 >
                     {/* {

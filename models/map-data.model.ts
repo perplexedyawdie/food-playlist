@@ -7,6 +7,12 @@ export interface CoordinatesData {
     description: string;
 }
 
+export interface PlaylistData {
+    title: string;
+    description: string;
+    id: string;
+}
+
 export interface MarkerCoords {
     lat: string;
     lng: string;
@@ -16,6 +22,12 @@ export enum PlaylistItemType {
     FOOD = '🍽',
     DRINK = '🥤',
     CHILL = '🏞'
+}
+
+export enum PlaylistItemTypeDesc {
+    FOOD = 'Food',
+    DRINK = 'Drink',
+    CHILL = 'Chill'
 }
 
 export interface MapCoordinates {
