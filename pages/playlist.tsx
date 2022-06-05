@@ -1,6 +1,7 @@
 import type { NextPage } from 'next'
 import Image from 'next/image'
 import CMarker from '../components/CMarker'
+import Header from '../components/Header'
 import MapView from '../components/MapView'
 import PlaylistCard from '../components/PlaylistCard'
 import PlaylistItem from '../components/PlaylistItem'
@@ -69,12 +70,12 @@ const Playlist: NextPage = () => {
     return (
       data.map((place) => {
         return (
-          <CMarker 
-          key={place.id} 
-          markerData={place}
-          // @ts-ignore
-          lat={parseFloat(place.lat)}
-          lng={parseFloat(place.lng)}
+          <CMarker
+            key={place.id}
+            markerData={place}
+            // @ts-ignore
+            lat={parseFloat(place.lat)}
+            lng={parseFloat(place.lng)}
           />
 
         )
@@ -86,7 +87,7 @@ const Playlist: NextPage = () => {
       <div className="hero min-h-screen bg-[#ffdcaa] items-start p-8">
         <div className="hero-content text-center">
           <div className="max-w-md space-y-8">
-            <Image src={'/assets/header-4.png'} alt='Logo saying Food Playlist' width={855} height={124} />
+            <Header />
             {/* <Image src={'/assets/header-3.png'} alt='Logo saying Food Playlist' width={760} height={68} /> */}
             {/* <Image src={'/assets/header-2.png'} alt='Logo saying Food Playlist' width={619} height={191} /> */}
 

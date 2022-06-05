@@ -6,6 +6,7 @@ import { useGeolocation } from 'react-use';
 import { GeoLocationSensorState } from 'react-use/lib/useGeolocation';
 import { FaRegSave } from 'react-icons/fa';
 import { PlaylistItemTypeDesc } from '../models/map-data.model';
+import Header from '../components/Header';
 
 interface CreatePlaylistMapViewProps {
     geoLoc: GeoLocationSensorState;
@@ -79,7 +80,8 @@ function CreatePlaylistMapView({ geoLoc }: CreatePlaylistMapViewProps) {
                     <MapView mapCoords={{
                         lat: geoLoc.latitude,
                         lng: geoLoc.longitude
-                    }} /> : <MapLoadingSkeleton />
+                    }}
+                    /> : <MapLoadingSkeleton />
             }
         </>
     )
@@ -93,8 +95,7 @@ const NewPlaylist: NextPage = () => {
 
                 <div className="hero-content text-center">
                     <div className="max-w-md space-y-8">
-                        <Image src={'/assets/header-4.png'} alt='Logo saying Food Playlist' width={855} height={124} />
-
+                        <Header />
                         <div className="flex flex-col space-y-4">
                             {/* <button className='self-end btn btn-block md:w-16 bg-[#d9c6f1] border-none hover:text-[#c79ffa] text-[#8b6faf] font-bold'>Add</button> */}
                             {/* <label htmlFor="create-playlist-modal" className='btn btn-outline text-black font-bold rounded-none border-4 hover:bg-black hover:text-white hover:border-black hover:drop-shadow-[4px_4px] transition-all ease-in-out duration-200'>Add New</label> */}
