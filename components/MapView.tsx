@@ -1,5 +1,5 @@
 import React from 'react'
-import GoogleMapReact, { Maps } from 'google-map-react';
+import GoogleMapReact, { Maps, MapOptions } from 'google-map-react';
 import { NextPage } from 'next';
 import { CoordinatesData, MarkerProps } from '../models/map-data.model';
 import PlaylistItem from './PlaylistItem';
@@ -13,11 +13,7 @@ const CMarker: NextPage<MarkerProps> = ({ foodPlaceName, foodPlaceType }: Marker
 
 const MapView: NextPage<Props> = ({ data }: Props) => {
     console.log('key: ', process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!)
-    const handleApiLoaded = (map, maps: Maps) => {
-        // use map and maps objects
-        console.log(map);
-        console.log(maps);
-      };
+    
     return (
         <>
             <div className='h-[300px] card rounded-none card-bordered border-4 drop-shadow-[4px_4px_rgba(0,0,0,1)]'>
@@ -31,7 +27,6 @@ const MapView: NextPage<Props> = ({ data }: Props) => {
                     }}
                     defaultZoom={18}
                     yesIWantToUseGoogleMapApiInternals
-                    onGoogleApiLoaded={({ map, maps }) => handleApiLoaded(map, maps)}
                 >
                     {
                         data.map((place) => (
