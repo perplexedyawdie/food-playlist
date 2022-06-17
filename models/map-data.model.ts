@@ -3,14 +3,8 @@ export interface CoordinatesData {
     lng: string;
     foodPlaceName: string;
     type: PlaylistItemType;
-    id: string;
+    id?: string;
     description: string;
-}
-
-export interface PlaylistData {
-    title: string;
-    description: string;
-    id: string;
 }
 
 export interface MarkerCoords {

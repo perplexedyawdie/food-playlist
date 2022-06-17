@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^2.9.0",
     "daisyui": "^2.15.2",
     "google-map-react": "^2.1.10",
     "mongodb": "^4.6.0",
@@ -17,7 +18,8 @@
     "react-dom": "18.1.0",
     "react-hook-form": "^7.31.3",
     "react-icons": "^4.4.0",
-    "react-use": "^17.4.0"
+    "react-use": "^17.4.0",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@types/google-map-react": "^2.1.7",

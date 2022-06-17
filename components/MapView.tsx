@@ -1,7 +1,8 @@
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useContext } from 'react'
 import GoogleMapReact, { ClickEventValue } from 'google-map-react';
 import { NextPage } from 'next';
 import { MapCoordinates } from '../models/map-data.model';
+import { CreatePlaylistContext } from '../context/CreatePlaylistContext';
 
 interface Props {
     mapCoords: MapCoordinates;
@@ -10,11 +11,25 @@ interface Props {
 }
 
 const MapView: NextPage<Props> = ({ mapCoords, markers, playlistItems }: Props) => {
+    const dataRetriever = useContext(CreatePlaylistContext);
     function handleMapClick(e: ClickEventValue) {
-        console.log("Map Click");
-        console.log(e);
+        try {
+            console.log("Map Click");
+            console.log(e);
+            /**
+             * *Clicking a control is registered as a map click & gives a coordinate.
+             * *I want to check that a control is not clicked before setting the coord state
+             */
+            if (e.event?.target?.localName == 'div') {
+                dataRetriever?.setuserClickLoc(e);
+            }
+        } catch (error) {
+            console.error('in handleMapClick');
+            console.error(error);
+        }
+
     }
-  
+
     return (
         <>
             <div className='h-[300px] card rounded-none card-bordered border-4 drop-shadow-[4px_4px_rgba(0,0,0,1)]'>
@@ -26,6 +41,7 @@ const MapView: NextPage<Props> = ({ mapCoords, markers, playlistItems }: Props) 
                     }}
                     defaultZoom={12}
                     onClick={handleMapClick}
+
                 >
                     {/* {
                         data.map((place) => (
@@ -39,7 +55,10 @@ const MapView: NextPage<Props> = ({ mapCoords, markers, playlistItems }: Props) 
                             />
                         ))
                     } */}
-                    {markers}
+                    {
+                        playlistItems || dataRetriever?.userClickLoc ?
+                            markers : null
+                    }
 
                 </GoogleMapReact>
 

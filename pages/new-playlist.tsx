@@ -1,25 +1,151 @@
 import { NextPage } from 'next'
-import React from 'react'
-import Image from 'next/image'
+import React, { useState, useContext, useEffect } from 'react'
 import MapView from '../components/MapView'
 import { useGeolocation } from 'react-use';
 import { GeoLocationSensorState } from 'react-use/lib/useGeolocation';
 import { FaRegSave } from 'react-icons/fa';
-import { PlaylistItemTypeDesc } from '../models/map-data.model';
+import { CoordinatesData, PlaylistItemType, PlaylistItemTypeDesc } from '../models/map-data.model';
 import Header from '../components/Header';
+import { CreatePlaylistContext } from '../context/CreatePlaylistContext';
+import { ClickEventValue } from 'google-map-react';
+import CMarker from '../components/CMarker';
+import { SubmitHandler, useForm, useFormState } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
+import { PlaylistData } from '../models/create-playlist.model';
 
 interface CreatePlaylistMapViewProps {
     geoLoc: GeoLocationSensorState;
 }
 
+// const PlaylistItemSchema = yup.object({
+//     foodPlaceName: yup.string().max(50).required(),
+//     type: yup.string().matches(/(🍽|🥤|🏞)/, { excludeEmptyString: true }).required(),
+//     description: yup.string().max(250).required(),
+//     lat: yup.number().required(),
+//     lng: yup.number().required(),
+//   }).required();
+
+const PlaylistSchema = yup.object({
+    title: yup.string().max(50).required(),
+    description: yup.string().max(250).required(),
+    playlistItem: yup.object().shape({
+        foodPlaceName: yup.string().max(50).required(),
+        type: yup.string().required(),
+        description: yup.string().max(250).required(),
+        lat: yup.string().required(),
+        lng: yup.string().required(),
+    })
+}).required();
+
+
+
+
+
 function CreatePlaylistForm() {
+    const [playlistItems, setPlaylistItems] = useState<CoordinatesData[]>([])
+    // const [isValid, setIsValid] = useState<boolean>(false)
+    const { register, unregister, handleSubmit, getValues, setValue, resetField, formState: { errors, isValid } } = useForm<PlaylistData>({
+        resolver: yupResolver(PlaylistSchema),
+        mode: 'all'
+    });
+
+    const dataRetriever = useContext(CreatePlaylistContext);
+
+    // useEffect(() => {
+    //   console.log('formState changed');
+    //   console.log(formState)
+    //   if (formState.isValid) {
+    //     setIsValid(true);
+    //   } else {
+    //     setIsValid(false);
+    //   }
+    // }, [formState])
+        
+
+    function handleEventTypeRadioBtnChange(e: any) {
+        // e.preventDefault();
+        console.log('radio btn changed')
+        console.log(e.target.value)
+        setValue('playlistItem.type', e.target.value);
+    }
+
+
+
+    function handleAddAnotherBtnClick(e: any) {
+        e.preventDefault();
+        console.log('adding another!')
+        const tempPlaylistItemData: CoordinatesData = {
+            foodPlaceName: getValues('playlistItem.foodPlaceName'),
+            type: getValues('playlistItem.type'),
+            description: getValues('playlistItem.description'),
+            lat: getValues('playlistItem.lat'),
+            lng: getValues('playlistItem.lng'),
+        };
+        setPlaylistItems((prev) => {
+            if (!prev) {
+                return [tempPlaylistItemData]
+            } else {
+                return [...prev, tempPlaylistItemData]
+            }
+        });
+        resetField('playlistItem.description');
+        resetField('playlistItem.foodPlaceName');
+        resetField('playlistItem.type');
+        resetField('playlistItem.lat');
+        resetField('playlistItem.lng');
+        setValue('title', getValues('title'));
+        setValue('description', getValues('description'));
+        if (dataRetriever?.userClickLoc) {
+            dataRetriever.setuserClickLoc(null);
+        }
+    }
+    useEffect(() => {
+      if (dataRetriever?.userClickLoc) {
+          setValue('playlistItem.lat', dataRetriever.userClickLoc.lat.toString());
+          setValue('playlistItem.lng', dataRetriever.userClickLoc.lng.toString());
+      }
+    }, [dataRetriever?.userClickLoc])
+    
+    useEffect(() => {
+        register('playlistItem.lat')
+        register('playlistItem.lng')
+
+        return () => {
+            unregister('playlistItem.lat')
+            unregister('playlistItem.lng')
+        }
+    }, [])
+
+    const onSubmit: SubmitHandler<PlaylistData> = (data) => {
+        console.log(data);
+        console.log('temp data')
+        console.log(playlistItems)
+    }
+    //TODO On Add Another click, save data to mongodb, retrieve document ID then hide the playlist title section. 
     return (
-        <>
+        <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="form-control w-full max-w-md">
+                <label className="label">
+                    <span className="label-text text-black font-extrabold">What&apos;s the title of this experience?</span>
+                </label>
+                <input {...register('title')} type="text" className="input bg-white input-bordered rounded-none border-black text-black font-extrabold w-full" />
+            </div>
+            <div className="form-control w-full max-w-md">
+                <label className="label">
+                    <span className="label-text text-black font-extrabold">What&apos;s the vibe like?</span>
+                </label>
+                <textarea {...register('description')} className="textarea rounded-none border-black text-black font-extrabold w-full bg-white" ></textarea>
+                <label className="label">
+                    <span className="label-text-alt"></span>
+                    <span className="label-text-alt font-bold">chars remaining</span>
+                </label>
+            </div>
             <div className="form-control w-full max-w-md">
                 <label className="label">
                     <span className="label-text text-black font-extrabold">What&apos;s the name of the place?</span>
                 </label>
-                <input type="text" className="input bg-white input-bordered rounded-none border-black text-black font-extrabold w-full" />
+                <input {...register('playlistItem.foodPlaceName')} type="text" className="input bg-white input-bordered rounded-none border-black text-black font-extrabold w-full" />
             </div>
             <div>
                 <div className="form-control w-full max-w-md">
@@ -27,20 +153,20 @@ function CreatePlaylistForm() {
                         <span className="label-text text-black font-extrabold">What can I do here?</span>
                     </label>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between" onChange={handleEventTypeRadioBtnChange}>
                     <div className="form-control">
                         <label className="label cursor-pointer">
-                            <span className='label-text text-black font-bold'>{PlaylistItemTypeDesc.FOOD}</span> &nbsp; <input type="radio" name="type-radio" className="radio radio-primary" />
+                            <span className='label-text text-black font-bold'>{PlaylistItemTypeDesc.FOOD}</span> &nbsp;<input {...register('playlistItem.type')} value={PlaylistItemType.FOOD} type="radio" name="type-radio" className="radio radio-primary" />
                         </label>
                     </div>
                     <div className="form-control">
                         <label className="label cursor-pointer">
-                            <span className='label-text text-black font-bold'>{PlaylistItemTypeDesc.DRINK}</span>&nbsp;<input type="radio" name="type-radio" className="radio radio-primary" />
+                            <span className='label-text text-black font-bold'>{PlaylistItemTypeDesc.DRINK}</span>&nbsp;<input {...register('playlistItem.type')} value={PlaylistItemType.DRINK} type="radio" name="type-radio" className="radio radio-primary" />
                         </label>
                     </div>
                     <div className="form-control">
                         <label className="label cursor-pointer">
-                            <span className='label-text text-black font-bold'>{PlaylistItemTypeDesc.CHILL}</span> &nbsp;<input type="radio" name="type-radio" className="radio radio-primary" />
+                            <span className='label-text text-black font-bold'>{PlaylistItemTypeDesc.CHILL}</span> &nbsp;<input {...register('playlistItem.type')} value={PlaylistItemType.CHILL} type="radio" name="type-radio" className="radio radio-primary" />
                         </label>
                     </div>
                 </div>
@@ -49,13 +175,28 @@ function CreatePlaylistForm() {
                 <label className="label">
                     <span className="label-text text-black font-extrabold">What should I do here?</span>
                 </label>
-                <textarea className="textarea rounded-none border-black text-black font-extrabold w-full bg-white" ></textarea>
+                <textarea {...register('playlistItem.description')} className="textarea rounded-none border-black text-black font-extrabold w-full bg-white" ></textarea>
                 <label className="label">
                     <span className="label-text-alt"></span>
                     <span className="label-text-alt font-bold">chars remaining</span>
                 </label>
             </div>
-        </>
+            <div className='flex justify-between'>
+                <button
+                    type='button'
+                    disabled={!isValid}
+                    onClick={handleAddAnotherBtnClick}
+                    className='btn bg-[#ffb700] text-black rounded-none border-4 hover:bg-black hover:text-white drop-shadow-[4px_4px] transition-all ease-in-out duration-200'>
+                    Add another place
+                </button>
+                <button
+                    type='submit'
+                    disabled={!isValid}
+                    className='btn bg-[#b1d0fe] text-black rounded-none border-4 hover:bg-black hover:text-white drop-shadow-[4px_4px] transition-all ease-in-out duration-200'>
+                    <FaRegSave size={24} />
+                </button>
+            </div>
+        </form>
     )
 
 }
@@ -73,6 +214,7 @@ function MapLoadingSkeleton() {
 }
 
 function CreatePlaylistMapView({ geoLoc }: CreatePlaylistMapViewProps) {
+    const { userClickLoc } = useContext(CreatePlaylistContext)!
     return (
         <>
             {
@@ -81,6 +223,13 @@ function CreatePlaylistMapView({ geoLoc }: CreatePlaylistMapViewProps) {
                         lat: geoLoc.latitude,
                         lng: geoLoc.longitude
                     }}
+                        markers={
+                            <CMarker
+                                // @ts-ignore
+                                lat={userClickLoc?.lat}
+                                lng={userClickLoc?.lng}
+                            />
+                        }
                     /> : <MapLoadingSkeleton />
             }
         </>
@@ -88,9 +237,13 @@ function CreatePlaylistMapView({ geoLoc }: CreatePlaylistMapViewProps) {
 }
 const NewPlaylist: NextPage = () => {
     const geoLoc = useGeolocation();
+    const [userClickLoc, setuserClickLoc] = useState<ClickEventValue | null>(null)
 
     return (
-        <>
+        <CreatePlaylistContext.Provider value={{
+            userClickLoc,
+            setuserClickLoc,
+        }}>
             <div className="hero min-h-screen bg-[#ffdcaa] items-start p-8">
 
                 <div className="hero-content text-center">
@@ -109,23 +262,11 @@ const NewPlaylist: NextPage = () => {
                                 </div>
                             </div>
                             <CreatePlaylistForm />
-                            <div className='flex justify-between'>
-                                <button
-                                    className='btn bg-[#ffb700] text-black rounded-none border-4 hover:bg-black hover:text-white drop-shadow-[4px_4px] transition-all ease-in-out duration-200'>
-                                    Add another place
-                                </button>
-                                <button
-                                    className='btn bg-[#b1d0fe] text-black rounded-none border-4 hover:bg-black hover:text-white drop-shadow-[4px_4px] transition-all ease-in-out duration-200'>
-                                    <FaRegSave size={24} />
-                                </button>
-                            </div>
-
-
                         </div>
                     </div>
                 </div>
             </div>
-        </>
+        </CreatePlaylistContext.Provider>
     )
 }
 

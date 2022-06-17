@@ -13,7 +13,7 @@ const CMarker: NextPage<Props> = ({ markerData }: Props) => {
             markerData ? 
             <div className='tooltip tooltip-open text-2xl text-purple-700' data-tip={(markerData as CoordinatesData).foodPlaceName}>{(markerData as CoordinatesData).type}</div>
             :
-            <GiPositionMarker size={24} />
+            <GiPositionMarker size={24} className='text-purple-700' />
         }
         </>
     )
