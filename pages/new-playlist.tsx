@@ -12,7 +12,7 @@ import CMarker from '../components/CMarker';
 import { SubmitHandler, useForm, useFormState } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
-import { PlaylistData } from '../models/create-playlist.model';
+import { PlaylistData, PlaylistDataDto } from '../models/create-playlist.model';
 
 interface CreatePlaylistMapViewProps {
     geoLoc: GeoLocationSensorState;
@@ -47,7 +47,7 @@ function CreatePlaylistForm() {
     // const [isValid, setIsValid] = useState<boolean>(false)
     const { register, unregister, handleSubmit, getValues, setValue, resetField, formState: { errors, isValid } } = useForm<PlaylistData>({
         resolver: yupResolver(PlaylistSchema),
-        mode: 'all'
+        mode: 'all',
     });
 
     const dataRetriever = useContext(CreatePlaylistContext);
@@ -121,6 +121,15 @@ function CreatePlaylistForm() {
         console.log(data);
         console.log('temp data')
         console.log(playlistItems)
+        const payload: PlaylistDataDto = {
+            title: data.title,
+            description: data.description,
+            playlistItem: []
+        };
+        payload.playlistItem = playlistItems;
+        payload.playlistItem.push(data.playlistItem);
+        console.log('payload');
+        console.log(payload)
     }
     //TODO On Add Another click, save data to mongodb, retrieve document ID then hide the playlist title section. 
     return (
