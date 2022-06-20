@@ -2,17 +2,18 @@
 import HTTPMethod from 'http-method-enum'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import HttpStatusCode from '../../models/http-status-codes.enum';
-import connectToDatabase from '../../libs/mongo';
+
 import * as yup from "yup";
 import { IApiResponse } from '../../models/playlist-api.model';
 import Playlist from '../../models/Playlist.model';
 import { isPlaylistDto } from '../../models/create-playlist.model';
+import dbProm from '../../libs/mongo';
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<IApiResponse>
 ) {
     try {
-        const { db, client } = await connectToDatabase();
+        const db = await dbProm;
      
         switch (req.method) {
             case HTTPMethod.GET:
