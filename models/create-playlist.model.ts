@@ -20,7 +20,7 @@ export default class Playlists {
     constructor(
         public title: string, 
         public description: string, 
-        public playlistItem: CoordinatesData, 
+        public playlistItem: CoordinatesData[], 
         public _id?: ObjectId
         ) {}
 }

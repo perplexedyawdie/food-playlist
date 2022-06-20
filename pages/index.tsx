@@ -47,7 +47,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const db = await dbProm;
     const playlistData = await getAllPlaylists(db);
     if (playlistData) {
-      console.log(playlistData[0]._id)
       return {
         props: {
           playlistData

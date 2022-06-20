@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import HttpStatusCode from '../../models/http-status-codes.enum';
 import * as yup from "yup";
 import { IApiResponse } from '../../models/playlist-api.model';
-import Playlists, { PlaylistData } from '../../models/create-playlist.model';
+import Playlists, { PlaylistData, PlaylistDataDto } from '../../models/create-playlist.model';
 import dbProm from '../../libs/mongo';
 import { Collection, Db, ObjectId } from 'mongodb';
 export default async function handler(
@@ -88,7 +88,7 @@ export default async function handler(
 
 }
 
-export async function getAllPlaylists(db: Db): Promise<PlaylistData[] | null> {
+export async function getAllPlaylists(db: Db): Promise<PlaylistDataDto[] | null> {
     const PlaylistItemSchema = yup.object().shape({
         foodPlaceName: yup.string().max(50).required(),
         type: yup.string().required(),
@@ -114,7 +114,7 @@ export async function getAllPlaylists(db: Db): Promise<PlaylistData[] | null> {
     }
 }
 
-export async function getAPlaylist(db: Db, _id: ObjectId): Promise<PlaylistData | null> {
+export async function getAPlaylist(db: Db, _id: ObjectId): Promise<PlaylistDataDto | null> {
     const PlaylistItemSchema = yup.object().shape({
         foodPlaceName: yup.string().max(50).required(),
         type: yup.string().required(),
@@ -140,14 +140,14 @@ export async function getAPlaylist(db: Db, _id: ObjectId): Promise<PlaylistData 
     }
 }
 
-function ObjectIdsToString(playlistData: Playlists[]): PlaylistData[] {
+function ObjectIdsToString(playlistData: Playlists[]): PlaylistDataDto[] {
     return playlistData.map((playlist) => ({
         ...playlist,
         _id: playlist._id?.toString()
     }))
 }
 
-function ObjectIdToString(playlistData: Playlists): PlaylistData {
+function ObjectIdToString(playlistData: Playlists): PlaylistDataDto {
         return {
             ...playlistData,
             _id: playlistData._id?.toString()
