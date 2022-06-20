@@ -1,11 +1,15 @@
-import type { NextPage } from 'next'
+import { ObjectId } from 'mongodb'
+import type { GetServerSideProps, GetStaticProps, NextPage } from 'next'
 import Image from 'next/image'
-import CMarker from '../components/CMarker'
-import Header from '../components/Header'
-import MapView from '../components/MapView'
-import PlaylistCard from '../components/PlaylistCard'
-import PlaylistItem from '../components/PlaylistItem'
-import { CoordinatesData, MapCoordinates, PlaylistItemType } from '../models/map-data.model'
+import { useRouter } from 'next/router'
+import CMarker from '../../components/CMarker'
+import Header from '../../components/Header'
+import MapView from '../../components/MapView'
+import PlaylistCard from '../../components/PlaylistCard'
+import PlaylistItem from '../../components/PlaylistItem'
+import dbProm from '../../libs/mongo'
+import { CoordinatesData, MapCoordinates, PlaylistItemType } from '../../models/map-data.model'
+import { getAPlaylist } from '../api/playlist'
 
 interface PlaylistItemsProps {
   data: CoordinatesData[];
@@ -105,6 +109,29 @@ const Playlist: NextPage = () => {
       </div>
     </>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  try {
+    const { query } = context;
+    const playlistId = new ObjectId((query.playlistId as string))
+    const db = await dbProm;
+    const playlistData = await getAPlaylist(db, playlistId);
+    if (playlistData) {
+      return {
+        props: {
+          playlistData
+        }
+      }
+    } else {
+      throw new Error('Data not retrieved');
+    }
+  } catch (error) {
+    console.error(error)
+    return {
+      notFound: true,
+    }
+  }
 }
 
 export default Playlist

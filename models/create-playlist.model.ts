@@ -1,4 +1,5 @@
 import { ClickEventValue } from "google-map-react";
+import { ObjectId } from "mongodb";
 import { CoordinatesData } from "./map-data.model";
 
 export interface PlaylistData {
@@ -13,6 +14,15 @@ export interface PlaylistDataDto {
     description: string;
     _id?: string;
     playlistItem: CoordinatesData[];
+}
+
+export default class Playlists {
+    constructor(
+        public title: string, 
+        public description: string, 
+        public playlistItem: CoordinatesData, 
+        public _id?: ObjectId
+        ) {}
 }
 
 export interface PlaylistDataRetriever {

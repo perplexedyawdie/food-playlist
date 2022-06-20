@@ -1,10 +1,14 @@
 import { Db, MongoClient, MongoClientOptions } from 'mongodb'
 
-if (!process.env.MONGODB_URI) {
+if (!process.env.MONGO_URI) {
   throw new Error('Please add your Mongo URI to .env.local')
 }
 
-if (!process.env.MONGODB_COLLECTION) {
+if (!process.env.MONGO_DB_NAME) {
+  throw new Error('Please add your Mongo DB Name to .env.local')
+}
+
+if (!process.env.MONGO_COLLECTION) {
   throw new Error('Please add your Mongo Collection to .env.local')
 }
 
@@ -12,8 +16,8 @@ let dbProm: Promise<Db>;
 const opts: MongoClientOptions = {}
 
 if (process.env.NODE_ENV === 'production') {
-  dbProm = MongoClient.connect(process.env.MONGODB_URI, opts)
-  .then(client => client.db(process.env.MONGODB_COLLECTION))
+  dbProm = MongoClient.connect(process.env.MONGO_URI, opts)
+  .then(client => client.db(process.env.MONGO_DB_NAME))
   .catch(err => {
     throw new Error(JSON.stringify(err));
   })
@@ -23,8 +27,8 @@ if (process.env.NODE_ENV === 'production') {
   };
 
   if (!globalWithDb.dbProm) {
-    globalWithDb.dbProm = MongoClient.connect(process.env.MONGODB_URI, opts)
-    .then(client => client.db(process.env.MONGODB_COLLECTION))
+    globalWithDb.dbProm = MongoClient.connect(process.env.MONGO_URI, opts)
+    .then(client => client.db(process.env.MONGO_DB_NAME))
     .catch(err => {
       throw new Error(JSON.stringify(err));
     });
