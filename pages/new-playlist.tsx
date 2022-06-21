@@ -13,18 +13,21 @@ import { SubmitHandler, useForm, useFormState } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import { PlaylistData, PlaylistDataDto } from '../models/create-playlist.model';
-
+import axios from 'axios';
+import { ApiEndpoint, IApiResponse } from '../models/playlist-api.model';
+import HttpStatusCode from '../models/http-status-codes.enum';
+import { useRouter } from 'next/router';
+import toast, { Toaster } from 'react-hot-toast';
 interface CreatePlaylistMapViewProps {
     geoLoc: GeoLocationSensorState;
 }
 
-// const PlaylistItemSchema = yup.object({
-//     foodPlaceName: yup.string().max(50).required(),
-//     type: yup.string().matches(/(🍽|🥤|🏞)/, { excludeEmptyString: true }).required(),
-//     description: yup.string().max(250).required(),
-//     lat: yup.number().required(),
-//     lng: yup.number().required(),
-//   }).required();
+const notifySuccess = () => toast.success('Playlist added successfully!', {
+    icon: '😋'
+});
+const notifyErr = () => toast.error('Try again later!', {
+    icon: '😢'
+});
 
 const PlaylistSchema = yup.object({
     title: yup.string().max(50).required(),
@@ -43,6 +46,8 @@ const PlaylistSchema = yup.object({
 
 
 function CreatePlaylistForm() {
+    const router = useRouter();
+
     const [playlistItems, setPlaylistItems] = useState<CoordinatesData[]>([])
     // const [isValid, setIsValid] = useState<boolean>(false)
     const { register, unregister, handleSubmit, getValues, setValue, resetField, formState: { errors, isValid } } = useForm<PlaylistData>({
@@ -118,9 +123,9 @@ function CreatePlaylistForm() {
     }, [])
 
     const onSubmit: SubmitHandler<PlaylistData> = (data) => {
-        console.log(data);
-        console.log('temp data')
-        console.log(playlistItems)
+        // console.log(data);
+        // console.log('temp data')
+        // console.log(playlistItems)
         const payload: PlaylistDataDto = {
             title: data.title,
             description: data.description,
@@ -128,8 +133,29 @@ function CreatePlaylistForm() {
         };
         payload.playlistItem = playlistItems;
         payload.playlistItem.push(data.playlistItem);
-        console.log('payload');
-        console.log(payload)
+        axios.post<IApiResponse>(ApiEndpoint.ADD_PLAYLIST, payload)
+        .then(({ data, status }) => {
+            if (status === HttpStatusCode.OK && data.success) {
+                console.log('saved playlist!');
+                console.log(data);
+                notifySuccess();
+                setTimeout(() => {
+                    
+                }, 1500);
+            } else {
+                throw new Error(JSON.stringify(data?.error));
+            }
+        })
+        .catch((err) => {
+            console.error(err)
+            notifyErr();
+            setTimeout(() => {
+                    
+            }, 1500);
+        })
+        .finally(() => router.push('/'))
+        // console.log('payload');
+        // console.log(payload)
     }
     //TODO On Add Another click, save data to mongodb, retrieve document ID then hide the playlist title section. 
     return (
@@ -205,6 +231,7 @@ function CreatePlaylistForm() {
                     <FaRegSave size={24} />
                 </button>
             </div>
+            <Toaster />
         </form>
     )
 

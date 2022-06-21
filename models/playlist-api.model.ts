@@ -5,3 +5,7 @@ export interface IApiResponse {
     error?: string;
     playlistData?: PlaylistDataDto[] | any;
 }
+
+export enum ApiEndpoint {
+    'ADD_PLAYLIST' = '/api/playlist'
+}
